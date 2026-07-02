@@ -1,5 +1,5 @@
 .work-section h2 {
-  margin-top: 100px;
+  margin-top: 0;
   font-size: 70px;
   font-weight: 500;
 }
@@ -17,12 +17,15 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding-top: 100px;
+  box-sizing: border-box;
   align-content: stretch;
 }
 .work-flex {
   width: 100%;
   display: flex;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   margin-left: -80px;
   padding-right: 120px;
   position: relative;
@@ -92,6 +95,8 @@
 }
 .work-image-in {
   position: relative;
+  width: 100%;
+  display: block;
 }
 .work-link {
   position: absolute;
@@ -126,11 +131,15 @@
   object-fit: cover;
 }
 .work-image img {
-  max-width: 100%;
-  max-height: 350px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
 }
 @media only screen and (max-height: 900px) {
   .work-image img {
+    height: auto;
     max-height: 250px;
   }
   .work-box {
@@ -140,7 +149,10 @@
   .work-section h2 {
     font-size: 60px;
     margin-bottom: 30px;
-    margin-top: 70px;
+    margin-top: 0;
+  }
+  .work-container {
+    padding-top: 70px;
   }
 }
 @media only screen and (max-width: 1400px) {
@@ -178,6 +190,7 @@
 
 @media only screen and (max-height: 650px) {
   .work-image img {
+    height: auto;
     max-height: 200px;
   }
   .work-section h2 {
@@ -201,10 +214,17 @@
   }
 } */
 @media only screen and (max-width: 1025px) {
+  .work-section {
+    height: auto;
+  }
   .work-container {
+    height: auto;
+    padding-top: 100px;
     align-content: normal;
   }
   .work-flex {
     height: auto;
+    flex: none;
+    min-height: auto;
   }
 }

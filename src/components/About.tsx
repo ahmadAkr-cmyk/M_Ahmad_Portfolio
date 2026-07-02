@@ -6,9 +6,11 @@ const About = () => {
       <div className="about-me">
         <h3 className="title">About Me</h3>
         <p className="para">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic quis
-          dolores numquam iusto Ratione earum ducimus autem id iure pariatur
-          dolorum quae maiores.
+          Backend-focused MERN Stack Developer — building secure, scalable REST
+          APIs, authentication systems, and server-side logic with Node.js,
+          Express, and MongoDB/MySQL. Solid frontend skills with React.js,
+          experience deploying full-stack applications, and hands-on expertise
+          integrating AI into real-world projects.
         </p>
       </div>
     </div>
