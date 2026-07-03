@@ -6,6 +6,57 @@
 .work-section h2 > span {
   color: var(--accentColor);
 }
+
+/* Header row: title + nav arrows */
+.work-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Arrow button container */
+.work-nav-arrows {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Individual arrow button — matches .work-link style */
+.work-nav-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--backgroundColor);
+  color: #eae5ec;
+  font-size: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.5),
+    inset 0px 0px 10px 0px #393939;
+  transition: opacity 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.work-nav-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0px 0px 14px 0px rgba(194, 164, 255, 0.5),
+    inset 0px 0px 10px 0px #393939;
+}
+
+.work-nav-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Disabled / boundary state */
+.work-nav-btn-disabled,
+.work-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
 .work-section {
   transition: 0s;
   height: 100vh;

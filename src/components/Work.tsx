@@ -3,10 +3,67 @@ import WorkImage from "./WorkImage";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useState, useCallback, useEffect } from "react";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+const TOTAL_CARDS = 6;
+
 const Work = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1025);
+
+  // Track viewport size for showing/hiding arrows
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1025);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Track current card index from scroll position
+  useEffect(() => {
+    if (!isDesktop) return;
+
+    const onScroll = () => {
+      const st = ScrollTrigger.getById("work");
+      if (!st) return;
+      const progress = st.progress;
+      const index = Math.round(progress * (TOTAL_CARDS - 1));
+      setCurrentIndex(index);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isDesktop]);
+
+  const scrollToCard = useCallback((index: number) => {
+    const st = ScrollTrigger.getById("work");
+    if (!st) return;
+
+    const targetProgress = index / (TOTAL_CARDS - 1);
+    const scrollStart = st.start;
+    const scrollEnd = st.end;
+    const targetScroll = scrollStart + targetProgress * (scrollEnd - scrollStart);
+
+    window.scrollTo({
+      top: targetScroll,
+      behavior: "smooth",
+    });
+  }, []);
+
+  const handlePrev = useCallback(() => {
+    const newIndex = Math.max(0, currentIndex - 1);
+    setCurrentIndex(newIndex);
+    scrollToCard(newIndex);
+  }, [currentIndex, scrollToCard]);
+
+  const handleNext = useCallback(() => {
+    const newIndex = Math.min(TOTAL_CARDS - 1, currentIndex + 1);
+    setCurrentIndex(newIndex);
+    scrollToCard(newIndex);
+  }, [currentIndex, scrollToCard]);
+
   useGSAP(() => {
     const mm = gsap.matchMedia();
 
@@ -66,9 +123,33 @@ const Work = () => {
   return (
     <div className="work-section" id="work">
       <div className="work-container section-container">
-        <h2>
-          My <span>Work</span>
-        </h2>
+        <div className="work-header">
+          <h2>
+            My <span>Work</span>
+          </h2>
+          {isDesktop && (
+            <div className="work-nav-arrows">
+              <button
+                className={`work-nav-btn${currentIndex === 0 ? " work-nav-btn-disabled" : ""}`}
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                aria-label="Previous project"
+                data-cursor="disable"
+              >
+                <MdChevronLeft />
+              </button>
+              <button
+                className={`work-nav-btn${currentIndex === TOTAL_CARDS - 1 ? " work-nav-btn-disabled" : ""}`}
+                onClick={handleNext}
+                disabled={currentIndex === TOTAL_CARDS - 1}
+                aria-label="Next project"
+                data-cursor="disable"
+              >
+                <MdChevronRight />
+              </button>
+            </div>
+          )}
+        </div>
         <div className="work-flex">
             <div className="work-box">
               <div className="work-info">
@@ -161,3 +242,4 @@ const Work = () => {
 };
 
 export default Work;
+
