@@ -1,1 +1,1 @@
-declare module 'gsap-trial/SplitText';
+export {};
