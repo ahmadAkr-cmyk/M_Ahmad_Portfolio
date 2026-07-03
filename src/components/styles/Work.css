@@ -277,5 +277,34 @@
     height: auto;
     flex: none;
     min-height: auto;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    margin-left: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+    scrollbar-width: none;
+  }
+  .work-flex::-webkit-scrollbar {
+    display: none;
+  }
+  .work-box {
+    width: 85vw;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .work-header {
+    position: relative;
+    z-index: 5;
+  }
+  .work-nav-arrows {
+    z-index: 10;
+    gap: 10px;
+  }
+  .work-nav-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
   }
 }

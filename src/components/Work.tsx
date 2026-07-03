@@ -3,7 +3,7 @@ import WorkImage from "./WorkImage";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -13,15 +13,16 @@ const TOTAL_CARDS = 6;
 const Work = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1025);
+  const workFlexRef = useRef<HTMLDivElement>(null);
 
-  // Track viewport size for showing/hiding arrows
+  // Track viewport size
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1025);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Track current card index from scroll position
+  // Desktop: track current card index from ScrollTrigger progress
   useEffect(() => {
     if (!isDesktop) return;
 
@@ -37,20 +38,50 @@ const Work = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isDesktop]);
 
-  const scrollToCard = useCallback((index: number) => {
-    const st = ScrollTrigger.getById("work");
-    if (!st) return;
+  // Mobile: track current card via scroll position on the horizontal container
+  useEffect(() => {
+    if (isDesktop) return;
+    const flexEl = workFlexRef.current;
+    if (!flexEl) return;
 
-    const targetProgress = index / (TOTAL_CARDS - 1);
-    const scrollStart = st.start;
-    const scrollEnd = st.end;
-    const targetScroll = scrollStart + targetProgress * (scrollEnd - scrollStart);
+    const onContainerScroll = () => {
+      const boxes = flexEl.querySelectorAll<HTMLElement>(".work-box");
+      if (boxes.length === 0) return;
+      const containerLeft = flexEl.scrollLeft;
+      const boxWidth = boxes[0].offsetWidth;
+      const idx = Math.round(containerLeft / boxWidth);
+      setCurrentIndex(Math.min(idx, TOTAL_CARDS - 1));
+    };
 
-    window.scrollTo({
-      top: targetScroll,
-      behavior: "smooth",
-    });
-  }, []);
+    flexEl.addEventListener("scroll", onContainerScroll, { passive: true });
+    return () => flexEl.removeEventListener("scroll", onContainerScroll);
+  }, [isDesktop]);
+
+  const scrollToCard = useCallback(
+    (index: number) => {
+      // Desktop: scroll the page to the GSAP ScrollTrigger position
+      const st = ScrollTrigger.getById("work");
+      if (st) {
+        const targetProgress = index / (TOTAL_CARDS - 1);
+        const targetScroll =
+          st.start + targetProgress * (st.end - st.start);
+        window.scrollTo({ top: targetScroll, behavior: "smooth" });
+        return;
+      }
+
+      // Mobile: scroll the horizontal container to the target card
+      const flexEl = workFlexRef.current;
+      if (!flexEl) return;
+      const boxes = flexEl.querySelectorAll<HTMLElement>(".work-box");
+      if (boxes[index]) {
+        flexEl.scrollTo({
+          left: boxes[index].offsetLeft - flexEl.offsetLeft,
+          behavior: "smooth",
+        });
+      }
+    },
+    []
+  );
 
   const handlePrev = useCallback(() => {
     const newIndex = Math.max(0, currentIndex - 1);
@@ -127,30 +158,28 @@ const Work = () => {
           <h2>
             My <span>Work</span>
           </h2>
-          {isDesktop && (
-            <div className="work-nav-arrows">
-              <button
-                className={`work-nav-btn${currentIndex === 0 ? " work-nav-btn-disabled" : ""}`}
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                aria-label="Previous project"
-                data-cursor="disable"
-              >
-                <MdChevronLeft />
-              </button>
-              <button
-                className={`work-nav-btn${currentIndex === TOTAL_CARDS - 1 ? " work-nav-btn-disabled" : ""}`}
-                onClick={handleNext}
-                disabled={currentIndex === TOTAL_CARDS - 1}
-                aria-label="Next project"
-                data-cursor="disable"
-              >
-                <MdChevronRight />
-              </button>
-            </div>
-          )}
+          <div className="work-nav-arrows">
+            <button
+              className={`work-nav-btn${currentIndex === 0 ? " work-nav-btn-disabled" : ""}`}
+              onClick={handlePrev}
+              disabled={currentIndex === 0}
+              aria-label="Previous project"
+              data-cursor="disable"
+            >
+              <MdChevronLeft />
+            </button>
+            <button
+              className={`work-nav-btn${currentIndex === TOTAL_CARDS - 1 ? " work-nav-btn-disabled" : ""}`}
+              onClick={handleNext}
+              disabled={currentIndex === TOTAL_CARDS - 1}
+              aria-label="Next project"
+              data-cursor="disable"
+            >
+              <MdChevronRight />
+            </button>
+          </div>
         </div>
-        <div className="work-flex">
+        <div className="work-flex" ref={workFlexRef}>
             <div className="work-box">
               <div className="work-info">
                 <div className="work-title">
